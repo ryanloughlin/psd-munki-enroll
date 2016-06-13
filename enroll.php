@@ -10,7 +10,6 @@ $building   = $_GET["building"];
 $room       = $_GET["room"];
 
 
-
 // Split the manifest path up to determine directory structure
 $directories		= explode( "/", $identifier, -1 ); 
 $total				= count( $directories );
@@ -18,20 +17,11 @@ $n					= 0;
 $identifier_path	= "";
 
 
-
-
-
 while ( $n < $total )
     {
         $identifier_path .= $directories[$n] . '/';
         $n++;
     }
-
-/*
-$myfile = fopen("/Volumes/Images/repo/manifests/newfile.txt", "w") or die("Unable to open file!");
-fwrite($myfile, $identifier_path);
-fclose($myfile);
-*/
 
 
 // Check if manifest already exists for this machine
@@ -66,6 +56,8 @@ else
         
     } 
 
+
+// Check if manifest already exists for the building
 if ( file_exists( '../manifests/' . $building . '/' . $building . '_general' ) )
     {
         echo "Computer manifest already exists.";
@@ -91,7 +83,7 @@ else
         
     }
 
-
+// Check if manifest already exists for this room
 if ( file_exists( '../manifests/' . $building . '/' . $room . '/' . $room . '_general' ) )
     {
         echo "Computer manifest already exists.";
@@ -116,16 +108,4 @@ else
         $plist->saveXML( '../manifests/' . $building . '/' . $room . '/' . $room . '_general' );
         
     }
-
-
-
-
-
-
-
-
-
-
-
-
 ?>
