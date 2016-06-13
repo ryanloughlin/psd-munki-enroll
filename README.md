@@ -2,10 +2,6 @@
 
 [munki-enroll](https://github.com/edingc/munki-enroll) files edited for use in the Portsmouth School Department
 
-
-Example manifest organization
-
-A simple example of manifest organization in Munki Enroll is shown below:
 ```
 . /manifests
 ├── approved (Software for all computers goes here.) 
