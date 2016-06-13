@@ -1,111 +1,47 @@
-<?php
-namespace CFPropertyList;
+#!/bin/bash 
 
-require_once( 'cfpropertylist-2.0.1/CFPropertyList.php' );
+# Gather computer information
+IDENTIFIER=$( defaults read /Library/Preferences/ManagedInstalls ClientIdentifier ); 
+HOSTNAME=$( scutil --get ComputerName );
 
-// Get the varibles passed by the enroll script
-$identifier = $_GET["identifier"];
-$hostname   = $_GET["hostname"];
-$building   = $_GET["building"];
-$room       = $_GET["room"];
+# Grab the building code from the front of the computer name
+BUILDING=${HOSTNAME:0:3};
+# set the room number to the character immediately following the building code
+ROOM=${HOSTNAME:3:1};
 
-
-// Split the manifest path up to determine directory structure
-$directories		= explode( "/", $identifier, -1 ); 
-$total				= count( $directories );
-$n					= 0;
-$identifier_path	= "";
-
-
-while ( $n < $total )
-    {
-        $identifier_path .= $directories[$n] . '/';
-        $n++;
-    }
-
-
-// Check if manifest already exists for this machine
-if ( file_exists( '../manifests/' . $identifier . "/" . $hostname ) )
-    {
-        echo "Computer manifest already exists.";
-    }
+# If it's a high school machine in the tech or music area, limit the room to 2 chars
+if [ "$BUILDING" == "PHS" -a "$ROOM" == "M" -o "$ROOM" == "T" ]; then
+	ROOM=${HOSTNAME:3:2};
+# If it's a middle school machine grab the zone id as well as the room number
+elif [ "$BUILDING" == "PMS"  -a "$ROOM" == "a" -o "$ROOM" == "b" -o "$ROOM" == "c"  ]; then
+	ROOM=${HOSTNAME:3:4};
+# otherwise the room is set to the 3 chars following the building code
 else
-    {
-        echo "Computer manifest does not exist. Will create.";
-        
-        if ( !is_dir( '../manifests/' . $identifier ) )
-            {
-                mkdir( '../manifests/' . $identifier, 0755, true );
-            }
-        
-        // Create the new manifest plist
-        $plist = new CFPropertyList();
-        $plist->add( $dict = new CFDictionary() );
-        
-        // Add manifest to production catalog by default
-        $dict->add( 'catalogs', $array = new CFArray() );
-        $array->add( new CFString( 'production' ) );
-        
-        // Add parent manifest to included_manifests to achieve waterfall effect
-        $dict->add( 'included_manifests', $array = new CFArray() );
-        $array->add( new CFString( $room . '_general' ) );
+	ROOM=${HOSTNAME:3:3};
+fi
+	
+# build the identifier from the ComputerName
+IDENTIFIER="$BUILDING/$ROOM/"
 
-        
-        // Save the newly created plist
-        $plist->saveXML( '../manifests/' . $identifier . "/" . $hostname );
-        
-    } 
+# Change this URL to the location for your Munki Enroll install
+SUBMITURL="http://munki.portsmouth.k12.nh.us/repo/munki-enroll/enroll.php"
+
+# Application paths
+CURL="/usr/bin/curl"
+
+# Submit the info to enroll.php
+$CURL --max-time 5 --silent --get \
+    -d hostname="$HOSTNAME" \
+    -d identifier="$IDENTIFIER" \
+    -d building="$BUILDING" \
+    -d room="$ROOM" \
+     "$SUBMITURL"
+
+# set the ClientIdentifier to building/room/client
+defaults write /Library/Preferences/ManagedInstalls ClientIdentifier "$IDENTIFIER$HOSTNAME"
+
+# set munki to install Apple Updates
+defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool True
 
 
-// Check if manifest already exists for the building
-if ( file_exists( '../manifests/' . $building . '/' . $building . '_general' ) )
-    {
-        echo "Computer manifest already exists.";
-    }
-else
-    {
-        echo "Computer manifest does not exist. Will create.";
-        
-        // Create the new manifest plist
-        $plist = new CFPropertyList();
-        $plist->add( $dict = new CFDictionary() );
-        
-        // Add manifest to production catalog by default
-        $dict->add( 'catalogs', $array = new CFArray() );
-        $array->add( new CFString( 'production' ) );
-        
-        // Add parent manifest to included_manifests to achieve waterfall effect
-        $dict->add( 'included_manifests', $array = new CFArray() );
-        $array->add( new CFString( 'approved' ) );
-        
-        // Save the newly created plist
-        $plist->saveXML( '../manifests/' . $building . '/' . $building . '_general' );
-        
-    }
-
-// Check if manifest already exists for this room
-if ( file_exists( '../manifests/' . $building . '/' . $room . '/' . $room . '_general' ) )
-    {
-        echo "Computer manifest already exists.";
-    }
-else
-    {
-        echo "Computer manifest does not exist. Will create.";
-        
-        // Create the new manifest plist
-        $plist = new CFPropertyList();
-        $plist->add( $dict = new CFDictionary() );
-        
-        // Add manifest to production catalog by default
-        $dict->add( 'catalogs', $array = new CFArray() );
-        $array->add( new CFString( 'production' ) );
-        
-        // Add parent manifest to included_manifests to achieve waterfall effect
-        $dict->add( 'included_manifests', $array = new CFArray() );
-        $array->add( new CFString( $building . '_general' ) );
-        
-        // Save the newly created plist
-        $plist->saveXML( '../manifests/' . $building . '/' . $room . '/' . $room . '_general' );
-        
-    }
-?>
+exit 0
