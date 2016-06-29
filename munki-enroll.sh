@@ -4,7 +4,7 @@
 IDENTIFIER=$( defaults read /Library/Preferences/ManagedInstalls ClientIdentifier ); 
 HOSTNAME=$( scutil --get ComputerName );
 TYPE=$( defaults read /Library/Preferences/com.apple.RemoteDesktop Text4 );
-
+IS_LAB=$( defaults read /Library/Preferences/com.apple.RemoteDesktop Text3 );
 
 
 # Grab the building code from the front of the computer name
@@ -23,8 +23,15 @@ else
 	ROOM=${HOSTNAME:3:3};
 fi
 	
-# build the identifier from the ComputerName & Type
-IDENTIFIER="$BUILDING/$TYPE/$ROOM/"
+# Determine if this is a lab machine or not
+if [ "$IS_LAB" == "lab" ]; then
+	# build the identifier from the ComputerName
+	IDENTIFIER="$BUILDING/$ROOM/"
+
+else
+	# build the identifier from the ComputerName & Type
+	IDENTIFIER="$BUILDING/$TYPE/$ROOM/"
+fi
 
 # Change this URL to the location for your Munki Enroll install
 SUBMITURL="http://munki.portsmouth.k12.nh.us/repo/munki-enroll/enroll.php"
@@ -39,6 +46,7 @@ $CURL --max-time 5 --silent --get \
     -d building="$BUILDING" \
     -d room="$ROOM" \
     -d type="$TYPE" \
+    -d is_lab="$IS_LAB" \
      "$SUBMITURL"
 
 # set the ClientIdentifier to building/type/room/client
