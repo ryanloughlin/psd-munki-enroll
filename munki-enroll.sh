@@ -22,13 +22,24 @@ elif [ "$BUILDING" == "PMS"  -a "$ROOM" == "a" -o "$ROOM" == "b" -o "$ROOM" == "
 else
 	ROOM=${HOSTNAME:3:3};
 fi
+
+if [ "$TYPE" == "laptop" ]; then
+	TYPE='Laptops';
+elif [ "$TYPE" == "desktop" ]; then
+	TYPE='Desktops';
+else
+	TYPE='Unknown';
+fi
+echo $TYPE
 	
 # Determine if this is a lab machine or not
 if [ "$IS_LAB" == "lab" ]; then
+	echo $IS_LAB
 	# build the identifier from the ComputerName
 	IDENTIFIER="$BUILDING/$ROOM/"
 
 else
+	echo "Not Lab"	
 	# build the identifier from the ComputerName & Type
 	IDENTIFIER="$BUILDING/$TYPE/$ROOM/"
 fi
