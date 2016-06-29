@@ -3,6 +3,9 @@
 # Gather computer information
 IDENTIFIER=$( defaults read /Library/Preferences/ManagedInstalls ClientIdentifier ); 
 HOSTNAME=$( scutil --get ComputerName );
+TYPE=( defaults read /Library/Preferences/com.apple.RemoteDesktop Text4 );
+
+
 
 # Grab the building code from the front of the computer name
 BUILDING=${HOSTNAME:0:3};
@@ -20,8 +23,8 @@ else
 	ROOM=${HOSTNAME:3:3};
 fi
 	
-# build the identifier from the ComputerName
-IDENTIFIER="$BUILDING/$ROOM/"
+# build the identifier from the ComputerName & Type
+IDENTIFIER="$BUILDING/$TYPE/$ROOM/"
 
 # Change this URL to the location for your Munki Enroll install
 SUBMITURL="http://munki.portsmouth.k12.nh.us/repo/munki-enroll/enroll.php"
