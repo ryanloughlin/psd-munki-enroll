@@ -38,13 +38,14 @@ $CURL --max-time 5 --silent --get \
     -d identifier="$IDENTIFIER" \
     -d building="$BUILDING" \
     -d room="$ROOM" \
+    -d type="$TYPE" \
      "$SUBMITURL"
 
 # set the ClientIdentifier to building/room/client
 defaults write /Library/Preferences/ManagedInstalls ClientIdentifier "$IDENTIFIER$HOSTNAME"
 
 # set munki to install Apple Updates
-defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool True
+# defaults write /Library/Preferences/ManagedInstalls InstallAppleSoftwareUpdates -bool True
 
 
 exit 0
