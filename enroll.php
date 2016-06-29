@@ -8,6 +8,7 @@ $identifier = $_GET["identifier"];
 $hostname   = $_GET["hostname"];
 $building   = $_GET["building"];
 $room       = $_GET["room"];
+$type       = $_GET["type"];
 
 
 
@@ -58,13 +59,14 @@ else
         
         // Add parent manifest to included_manifests to achieve waterfall effect
         $dict->add( 'included_manifests', $array = new CFArray() );
-        $array->add( new CFString( $building . '/' . $room . '/' . $room . '_default' ) );
+        $array->add( new CFString( $building . '/' . $type . '/'  . $room . '/' . $room . '_default' ) );
 
         
         // Save the newly created plist
         $plist->saveXML( '../manifests/' . $identifier . "/" . $hostname );
         
     } 
+
 
 if ( file_exists( '../manifests/' . $building . '/' . $building . '_default' ) )
     {
@@ -92,7 +94,34 @@ else
     }
 
 
-if ( file_exists( '../manifests/' . $building . '/' . $room . '/' . $room . '_default' ) )
+if ( file_exists( '../manifests/' . $building . '/' . $type . '/' . $type . '_default' ) )
+    {
+        echo "$type manifest already exists.";
+    }
+else
+    {
+        echo "$type manifest does not exist. Will create.";
+        
+                // Create the new manifest plist
+        $plist = new CFPropertyList();
+        $plist->add( $dict = new CFDictionary() );
+        
+        // Add manifest to production catalog by default
+        $dict->add( 'catalogs', $array = new CFArray() );
+        $array->add( new CFString( 'production' ) );
+        
+        // Add parent manifest to included_manifests to achieve waterfall effect
+        $dict->add( 'included_manifests', $array = new CFArray() );
+        $array->add( new CFString( $building . '/' . $building. '_default' ) );
+        
+        // Save the newly created plist
+        $plist->saveXML( '../manifests/' . $building . '/' . $type . '/' . $type . '_default' );
+        
+    }
+
+
+
+if ( file_exists( '../manifests/' . $building . '/' . $type . '/'  . $room . '/' . $room . '_default' ) )
     {
         echo "Room manifest already exists.";
     }
@@ -110,10 +139,10 @@ else
         
         // Add parent manifest to included_manifests to achieve waterfall effect
         $dict->add( 'included_manifests', $array = new CFArray() );
-        $array->add( new CFString( $building . '/' . $building. '_default' ) );
+        $array->add( new CFString( $building . '/' . $type . '/' . $type . '_default' ) );
         
         // Save the newly created plist
-        $plist->saveXML( '../manifests/' . $building . '/' . $room . '/' . $room . '_default' );
+        $plist->saveXML( '../manifests/' . $building . '/' . $type . '/'  . $room . '/' . $room . '_default' );
         
     }
 
