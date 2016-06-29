@@ -3,7 +3,7 @@
 # Gather computer information
 IDENTIFIER=$( defaults read /Library/Preferences/ManagedInstalls ClientIdentifier ); 
 HOSTNAME=$( scutil --get ComputerName );
-TYPE=( defaults read /Library/Preferences/com.apple.RemoteDesktop Text4 );
+TYPE=$( defaults read /Library/Preferences/com.apple.RemoteDesktop Text4 );
 
 
 
@@ -41,7 +41,7 @@ $CURL --max-time 5 --silent --get \
     -d type="$TYPE" \
      "$SUBMITURL"
 
-# set the ClientIdentifier to building/room/client
+# set the ClientIdentifier to building/type/room/client
 defaults write /Library/Preferences/ManagedInstalls ClientIdentifier "$IDENTIFIER$HOSTNAME"
 
 # set munki to install Apple Updates
