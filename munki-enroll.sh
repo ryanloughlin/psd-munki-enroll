@@ -3,7 +3,20 @@
 # Gather computer information
 IDENTIFIER=$( defaults read /Library/Preferences/ManagedInstalls ClientIdentifier ); 
 HOSTNAME=$( scutil --get ComputerName );
-TYPE=$( defaults read /Library/Preferences/com.apple.RemoteDesktop Text4 );
+# Get the model and search for Book in the result
+is_laptop=$(sysctl -n hw.model | grep Book)
+
+# If the model contains Book it's a laptop, otherwise assume it's a desktop
+if [ "$is_laptop" != "" ]; then
+TYPE=laptop
+else
+TYPE=desktop
+fi
+
+
+
+
+
 IS_LAB=$( defaults read /Library/Preferences/com.apple.RemoteDesktop Text3 );
 
 
