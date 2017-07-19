@@ -14,11 +14,9 @@ TYPE=desktop
 fi
 
 
-
-
-
-IS_LAB=$( defaults read /Library/Preferences/com.apple.RemoteDesktop Text3 );
-
+if [[ $HOSTNAME == *"lab"* ]]; then
+IS_LAB=True
+fi
 
 # Grab the building code from the front of the computer name
 BUILDING=${HOSTNAME:0:3};
@@ -46,7 +44,7 @@ fi
 echo $TYPE
 	
 # Determine if this is a lab machine or not
-if [ "$IS_LAB" == "lab" ]; then
+if [ "$IS_LAB" == "True" ]; then
 	echo $IS_LAB
 	# build the identifier from the ComputerName
 	IDENTIFIER="$BUILDING/$ROOM/"
